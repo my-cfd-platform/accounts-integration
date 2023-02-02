@@ -1,0 +1,65 @@
+syntax = "proto3";
+package accounts_integration;
+
+enum AccountsIntegrationOperationResult{
+    Ok = 0;
+    AccountNotFound = 1;
+    TraderNotFound = 2;
+    NotEnoughBalance = 3;
+}
+
+enum AccountsIntegrationUpdateAccountBalanceReason{
+    BalanceCorrection = 0;
+    Deposit = 1;
+    Withdrawal = 2;
+}
+
+message AccountsIntegrationClientAccountGrpcModel{
+    string TraderId = 1;
+    string AccountId = 2;
+    string Currency = 3;
+    double Balance = 4;
+    string TradingGroupId = 5;
+    uint64 CreatedAt = 6;
+    uint64 UpdatedAt = 7;
+    bool TradingDisabled = 8;
+}
+
+message AccountsIntegrationUpdateAccountBalanceGrpcRequest{
+    string TraderId = 1;
+    string AccountId = 2;
+    double Delta = 3;
+    string Comment = 4;
+    string ProcessId = 5;
+    bool AllowNegativeBalance = 6;
+ 
+}
+
+message AccountsIntegrationAccountGrpcResponse{
+    accounts_integration.AccountsIntegrationOperationResult Result = 1;
+    accounts_integration.AccountsIntegrationClientAccountGrpcModel Account = 2;
+}
+
+message AccountsIntegrationCreateClientAccountGrpcRequest{
+    string TraderId = 1;
+    string Currency = 2;
+    string ProcessId = 3;
+}
+
+message AccountsIntegrationGetClientAccountsGrpcRequest{
+    string TraderId = 1;
+}
+
+message AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest{
+    string TraderId = 1;
+    string AccountId = 2;
+    bool TradingDisabled = 3;
+    string ProcessId = 4;
+}
+
+service AccountsIntegrationGrpcService {
+    rpc CreateClientAccount(accounts_integration.AccountsIntegrationCreateClientAccountGrpcRequest) returns (accounts_integration.AccountsIntegrationAccountGrpcResponse);
+    rpc UpdateClientAccountBalance(accounts_integration.AccountsIntegrationUpdateAccountBalanceGrpcRequest) returns (accounts_integration.AccountsIntegrationAccountGrpcResponse);
+    rpc GetClientAccounts(accounts_integration.AccountsIntegrationGetClientAccountsGrpcRequest) returns (stream accounts_integration.AccountsIntegrationClientAccountGrpcModel);
+    rpc UpdateAccountTradingDisabled(accounts_integration.AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest) returns (accounts_integration.AccountsIntegrationAccountGrpcResponse);
+}
