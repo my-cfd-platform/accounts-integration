@@ -1,12 +1,14 @@
 use std::pin::Pin;
 
+use rust_extensions::date_time::DateTimeAsMicroseconds;
+
 use crate::accounts_integration::{
     accounts_integration_grpc_service_server::AccountsIntegrationGrpcService,
     AccountsIntegrationAccountGrpcResponse, AccountsIntegrationClientAccountGrpcModel,
     AccountsIntegrationCreateClientAccountGrpcRequest,
     AccountsIntegrationGetClientAccountsGrpcRequest,
     AccountsIntegrationUpdateAccountBalanceGrpcRequest,
-    AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest,
+    AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest, PingResponse,
 };
 
 use super::server::GrpcService;
@@ -167,5 +169,16 @@ impl AccountsIntegrationGrpcService for GrpcService {
             .await;
 
         my_grpc_extensions::grpc_server::send_vec_to_stream(accounts, |x| x.into()).await
+    }
+
+    async fn ping(
+        &self,
+        _: tonic::Request<()>,
+    ) -> Result<tonic::Response<PingResponse>, tonic::Status> {
+       
+        return Ok(tonic::Response::new(PingResponse{
+            service_name: "ACCOUNTS_INTEGRATION".to_string(),
+            date_time: DateTimeAsMicroseconds::now().unix_microseconds as u64,
+        }));
     }
 }
