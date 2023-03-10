@@ -39,6 +39,7 @@ impl AccountsIntegrationGrpcService for GrpcService {
             trader_id,
             currency,
             process_id,
+            trading_group_id,
         } = request.into_inner();
 
         let account = self
@@ -48,6 +49,7 @@ impl AccountsIntegrationGrpcService for GrpcService {
                 trader_id,
                 process_id,
                 currency,
+                trading_group_id,
                 my_telemetry_context.get_ctx(),
             )
             .await;
@@ -175,8 +177,7 @@ impl AccountsIntegrationGrpcService for GrpcService {
         &self,
         _: tonic::Request<()>,
     ) -> Result<tonic::Response<PingResponse>, tonic::Status> {
-       
-        return Ok(tonic::Response::new(PingResponse{
+        return Ok(tonic::Response::new(PingResponse {
             service_name: "ACCOUNTS_INTEGRATION".to_string(),
             date_time: DateTimeAsMicroseconds::now().unix_microseconds as u64,
         }));

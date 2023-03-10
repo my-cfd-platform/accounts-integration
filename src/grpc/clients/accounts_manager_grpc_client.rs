@@ -43,6 +43,7 @@ impl AccountsManagerGrpcClient {
         trader_id: String,
         process_id: String,
         currency: String,
+        trading_group_id: Option<String>,
         my_telemetry_context: &MyTelemetryContext,
     ) -> AccountGrpcModel {
         let mut client = self.create_grpc_service(my_telemetry_context);
@@ -50,6 +51,7 @@ impl AccountsManagerGrpcClient {
             trader_id,
             currency,
             process_id,
+            trading_group_id,
         });
 
         let response = tokio::time::timeout(self.timeout, future)
