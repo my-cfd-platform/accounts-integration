@@ -14,7 +14,8 @@ my-settings-reader = { tag = "0.1.5", git = "https://github.com/MyJetTools/my-se
 ] }
 
 flurl = { tag = "0.2.3", git = "https://github.com/MyJetTools/fl-url.git" }
-
+my-seq-logger = { tag = "0.2.1", git = "https://github.com/MyJetTools/my-seq-logger.git" }
+async-trait = "*"
 tokio = { version = "*", features = ["full"] }
 tokio-util = "*"
 tokio-test = "0.4.2"

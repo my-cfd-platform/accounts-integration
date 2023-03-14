@@ -3,6 +3,9 @@ use std::sync::Arc;
 use rust_extensions::AppStates;
 
 use crate::{AccountsManagerGrpcClient, SettingsModel};
+
+pub const APP_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+pub const APP_NAME: &'static str = env!("CARGO_PKG_NAME");
 pub struct AppContext {
     pub accounts_manager_grpc_client: Arc<AccountsManagerGrpcClient>,
     pub settings: Arc<SettingsModel>,
