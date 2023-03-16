@@ -8,7 +8,7 @@ use crate::accounts_integration::{
     AccountsIntegrationCreateClientAccountGrpcRequest,
     AccountsIntegrationGetClientAccountsGrpcRequest,
     AccountsIntegrationUpdateAccountBalanceGrpcRequest,
-    AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest, PingResponse,
+    AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest, PingResponse, AccountsIntegrationUpdateAccountBalanceReason,
 };
 
 use super::server::GrpcService;
@@ -79,6 +79,7 @@ impl AccountsIntegrationGrpcService for GrpcService {
             comment,
             process_id,
             allow_negative_balance,
+            reason
         } = request.into_inner();
 
         let account = self
@@ -91,7 +92,9 @@ impl AccountsIntegrationGrpcService for GrpcService {
                 allow_negative_balance,
                 process_id,
                 comment,
+                AccountsIntegrationUpdateAccountBalanceReason::from(reason),
                 my_telemetry_context.get_ctx(),
+
             )
             .await;
 

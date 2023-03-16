@@ -1,8 +1,8 @@
 use crate::{
     accounts_integration::{
-        AccountsIntegrationClientAccountGrpcModel, AccountsIntegrationOperationResult,
+        AccountsIntegrationClientAccountGrpcModel, AccountsIntegrationOperationResult, AccountsIntegrationUpdateAccountBalanceReason,
     },
-    accounts_manager::{AccountGrpcModel, AccountsManagerOperationResult},
+    accounts_manager::{AccountGrpcModel, AccountsManagerOperationResult, UpdateBalanceReason},
 };
 
 impl Into<AccountsIntegrationClientAccountGrpcModel> for AccountGrpcModel {
@@ -16,6 +16,27 @@ impl Into<AccountsIntegrationClientAccountGrpcModel> for AccountGrpcModel {
             created_at: self.create_date,
             updated_at: self.last_update_date,
             trading_disabled: self.trading_disabled,
+        }
+    }
+}
+
+impl From<i32> for AccountsIntegrationUpdateAccountBalanceReason  {
+    fn from(value: i32) -> Self {
+        match value{
+            0 => AccountsIntegrationUpdateAccountBalanceReason::BalanceCorrection,
+            1 => AccountsIntegrationUpdateAccountBalanceReason::Deposit,
+            2 => AccountsIntegrationUpdateAccountBalanceReason::Withdrawal,
+            _ => panic!("Unknown value for AccountsIntegrationUpdateAccountBalanceReason")
+        }
+    }
+}
+
+impl Into<UpdateBalanceReason> for AccountsIntegrationUpdateAccountBalanceReason {
+    fn into(self) -> UpdateBalanceReason {
+        match self{
+            AccountsIntegrationUpdateAccountBalanceReason::BalanceCorrection => UpdateBalanceReason::BalanceCorrection,
+            AccountsIntegrationUpdateAccountBalanceReason::Deposit => UpdateBalanceReason::Deposit,
+            AccountsIntegrationUpdateAccountBalanceReason::Withdrawal => UpdateBalanceReason::Withdrawal,
         }
     }
 }

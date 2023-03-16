@@ -3,12 +3,12 @@ use my_telemetry::MyTelemetryContext;
 use std::time::Duration;
 use tonic::{codegen::InterceptedService, transport::Channel};
 
-use crate::accounts_manager::{
+use crate::{accounts_manager::{
     accounts_manager_grpc_service_client::AccountsManagerGrpcServiceClient, AccountGrpcModel,
     AccountManagerCreateAccountGrpcRequest, AccountManagerGetClientAccountGrpcRequest,
     AccountManagerGetClientAccountsGrpcRequest, AccountManagerUpdateAccountBalanceGrpcRequest,
     AccountManagerUpdateTradingDisabledGrpcRequest, AccountsManagerOperationResult,
-};
+}, accounts_integration::AccountsIntegrationUpdateAccountBalanceReason};
 
 pub struct AccountsManagerGrpcClient {
     channel: Channel,
@@ -70,6 +70,7 @@ impl AccountsManagerGrpcClient {
         allow_negative_balance: bool,
         process_id: String,
         comment: String,
+        reason: AccountsIntegrationUpdateAccountBalanceReason,
         my_telemetry_context: &MyTelemetryContext,
     ) -> Result<AccountGrpcModel, AccountsManagerOperationResult> {
         let mut client = self.create_grpc_service(my_telemetry_context);
@@ -81,6 +82,8 @@ impl AccountsManagerGrpcClient {
                 comment,
                 process_id,
                 allow_negative_balance,
+                reason: reason.into(),
+                reference_transaction_id: None,
             });
 
         let response = tokio::time::timeout(self.timeout, future)
