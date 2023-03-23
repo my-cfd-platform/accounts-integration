@@ -4,11 +4,13 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 use crate::accounts_integration::{
     accounts_integration_grpc_service_server::AccountsIntegrationGrpcService,
-    AccountsIntegrationAccountGrpcResponse, AccountsIntegrationClientAccountGrpcModel,
+    AccountsIntegrationAccountBalanceUpdateInfoGrpc, AccountsIntegrationAccountGrpcResponse,
+    AccountsIntegrationAccountUpdateBalanceGrpcResponse, AccountsIntegrationClientAccountGrpcModel,
     AccountsIntegrationCreateClientAccountGrpcRequest,
     AccountsIntegrationGetClientAccountsGrpcRequest,
     AccountsIntegrationUpdateAccountBalanceGrpcRequest,
-    AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest, PingResponse, AccountsIntegrationUpdateAccountBalanceReason,
+    AccountsIntegrationUpdateAccountBalanceReason,
+    AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest, PingResponse,
 };
 
 use super::server::GrpcService;
@@ -65,7 +67,8 @@ impl AccountsIntegrationGrpcService for GrpcService {
     async fn update_client_account_balance(
         &self,
         request: tonic::Request<AccountsIntegrationUpdateAccountBalanceGrpcRequest>,
-    ) -> Result<tonic::Response<AccountsIntegrationAccountGrpcResponse>, tonic::Status> {
+    ) -> Result<tonic::Response<AccountsIntegrationAccountUpdateBalanceGrpcResponse>, tonic::Status>
+    {
         let my_telemetry_context = my_grpc_extensions::get_telemetry(
             &request.metadata(),
             request.remote_addr(),
@@ -79,7 +82,7 @@ impl AccountsIntegrationGrpcService for GrpcService {
             comment,
             process_id,
             allow_negative_balance,
-            reason
+            reason,
         } = request.into_inner();
 
         let account = self
@@ -94,17 +97,19 @@ impl AccountsIntegrationGrpcService for GrpcService {
                 comment,
                 AccountsIntegrationUpdateAccountBalanceReason::from(reason),
                 my_telemetry_context.get_ctx(),
-
             )
             .await;
 
         let response = match account {
-            Ok(account) => AccountsIntegrationAccountGrpcResponse {
-                account: Some(account.into()),
+            Ok(result) => AccountsIntegrationAccountUpdateBalanceGrpcResponse {
+                update_balance_info: Some(AccountsIntegrationAccountBalanceUpdateInfoGrpc {
+                    operation_id: result.operation_id,
+                    account: Some(result.account.unwrap().into()),
+                }),
                 result: 0,
             },
-            Err(error) => AccountsIntegrationAccountGrpcResponse {
-                account: None,
+            Err(error) => AccountsIntegrationAccountUpdateBalanceGrpcResponse {
+                update_balance_info: None,
                 result: error.into(),
             },
         };

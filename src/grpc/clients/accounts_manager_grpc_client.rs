@@ -7,8 +7,8 @@ use crate::{accounts_manager::{
     accounts_manager_grpc_service_client::AccountsManagerGrpcServiceClient, AccountGrpcModel,
     AccountManagerCreateAccountGrpcRequest, AccountManagerGetClientAccountGrpcRequest,
     AccountManagerGetClientAccountsGrpcRequest, AccountManagerUpdateAccountBalanceGrpcRequest,
-    AccountManagerUpdateTradingDisabledGrpcRequest, AccountsManagerOperationResult,
-}, accounts_integration::AccountsIntegrationUpdateAccountBalanceReason};
+    AccountManagerUpdateTradingDisabledGrpcRequest, AccountsManagerOperationResult, AccountManagerUpdateBalanceBalanceGrpcInfo,
+}, accounts_integration::{AccountsIntegrationUpdateAccountBalanceReason}};
 
 pub struct AccountsManagerGrpcClient {
     channel: Channel,
@@ -72,7 +72,7 @@ impl AccountsManagerGrpcClient {
         comment: String,
         reason: AccountsIntegrationUpdateAccountBalanceReason,
         my_telemetry_context: &MyTelemetryContext,
-    ) -> Result<AccountGrpcModel, AccountsManagerOperationResult> {
+    ) -> Result<AccountManagerUpdateBalanceBalanceGrpcInfo, AccountsManagerOperationResult> {
         let mut client = self.create_grpc_service(my_telemetry_context);
         let future =
             client.update_client_account_balance(AccountManagerUpdateAccountBalanceGrpcRequest {
@@ -94,7 +94,7 @@ impl AccountsManagerGrpcClient {
         let response = response.into_inner();
 
         let to_return = match response.result {
-            0 => Ok(response.account.unwrap()),
+            0 => Ok(response.update_balance_info.unwrap()),
             1 => Err(AccountsManagerOperationResult::AccountNotFound),
             2 => Err(AccountsManagerOperationResult::TraderNotFound),
             3 => Err(AccountsManagerOperationResult::NotEnoughBalance),
