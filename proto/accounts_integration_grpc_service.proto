@@ -36,11 +36,6 @@ message AccountsIntegrationUpdateAccountBalanceGrpcRequest{
     accounts_integration.AccountsIntegrationUpdateAccountBalanceReason Reason = 7;
 }
 
-message AccountsIntegrationAccountBalanceUpdateInfoGrpc{
-    string OperationId = 1;
-    accounts_integration.AccountsIntegrationClientAccountGrpcModel Account = 2;
-}
-
 message AccountsIntegrationAccountGrpcResponse{
     accounts_integration.AccountsIntegrationOperationResult Result = 1;
     accounts_integration.AccountsIntegrationClientAccountGrpcModel Account = 2;
@@ -49,6 +44,11 @@ message AccountsIntegrationAccountGrpcResponse{
 message AccountsIntegrationAccountUpdateBalanceGrpcResponse{
     accounts_integration.AccountsIntegrationOperationResult Result = 1;
     accounts_integration.AccountsIntegrationAccountBalanceUpdateInfoGrpc UpdateBalanceInfo = 2;
+}
+
+message AccountsIntegrationAccountBalanceUpdateInfoGrpc{
+    string OperationId = 1;
+    accounts_integration.AccountsIntegrationClientAccountGrpcModel Account = 2;
 }
 
 message AccountsIntegrationCreateClientAccountGrpcRequest{
