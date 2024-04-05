@@ -2,7 +2,6 @@ service_sdk::macros::use_grpc_server!();
 
 use crate::accounts_integration::accounts_integration_grpc_service_server::AccountsIntegrationGrpcService;
 use crate::accounts_integration::*;
-use crate::accounts_manager_grpc;
 
 use super::server::GrpcService;
 
@@ -47,45 +46,34 @@ impl AccountsIntegrationGrpcService for GrpcService {
     {
         let request = request.into_inner();
 
-        todo!("Implement")
-        /*
-        let result = self
-            .app
-            .accounts_manager_grpc_client
-            .update_client_account_balance(
-                accounts_manager_grpc::AccountManagerUpdateAccountBalanceGrpcRequest {
-                    trader_id: request.trader_id,
-                    account_id: request.account_id,
-                    delta: request.delta,
-                    allow_negative_balance: request.allow_negative_balance,
-                    process_id: request.process_id,
-                    comment: request.comment,
-                    reason: request.reason(),
-                },
-                my_telemetry,
-            )
-            .await
-            .unwrap();
+        let reason = request.reason();
 
-        let response =
-            super::mappers::convert_result(result.result(), || result.update_balance_info.unwrap());
+        let response = crate::flows::update_balance(
+            &self.app,
+            request.trader_id,
+            request.account_id,
+            request.delta,
+            request.allow_negative_balance,
+            request.process_id,
+            request.comment,
+            reason,
+            request.reference_transaction_id,
+            my_telemetry,
+        )
+        .await;
 
         let response = match response {
-            Ok(data) => AccountsIntegrationAccountUpdateBalanceGrpcResponse {
-                update_balance_info: Some(AccountsIntegrationAccountBalanceUpdateInfoGrpc {
-                    operation_id: data.operation_id,
-                    account: Some(data.account.unwrap().into()),
-                }),
+            Ok(model) => AccountsIntegrationAccountUpdateBalanceGrpcResponse {
                 result: 0,
+                update_balance_info: Some(model),
             },
             Err(error) => AccountsIntegrationAccountUpdateBalanceGrpcResponse {
-                update_balance_info: None,
                 result: error.into(),
+                update_balance_info: None,
             },
         };
 
         Ok(tonic::Response::new(response))
-         */
     }
 
     #[with_telemetry]
