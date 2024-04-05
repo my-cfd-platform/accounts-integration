@@ -7,6 +7,8 @@ enum AccountsIntegrationOperationResult{
     AccountNotFound = 1;
     TraderNotFound = 2;
     NotEnoughBalance = 3;
+    ProcessIdDuplicate = 4;
+    InvalidTradingGroup = 5;
 }
 
 enum AccountsIntegrationUpdateAccountBalanceReason{
@@ -34,11 +36,12 @@ message AccountsIntegrationUpdateAccountBalanceGrpcRequest{
     string ProcessId = 5;
     bool AllowNegativeBalance = 6;
     accounts_integration.AccountsIntegrationUpdateAccountBalanceReason Reason = 7;
+    optional string ReferenceTransactionId = 8;
 }
 
 message AccountsIntegrationAccountGrpcResponse{
-    accounts_integration.AccountsIntegrationOperationResult Result = 1;
-    accounts_integration.AccountsIntegrationClientAccountGrpcModel Account = 2;
+    AccountsIntegrationOperationResult Result = 1;
+    AccountsIntegrationClientAccountGrpcModel Account = 2;
 }
 
 message AccountsIntegrationAccountUpdateBalanceGrpcResponse{
@@ -79,5 +82,5 @@ service AccountsIntegrationGrpcService {
     rpc UpdateClientAccountBalance(accounts_integration.AccountsIntegrationUpdateAccountBalanceGrpcRequest) returns (accounts_integration.AccountsIntegrationAccountUpdateBalanceGrpcResponse);
     rpc GetClientAccounts(accounts_integration.AccountsIntegrationGetClientAccountsGrpcRequest) returns (stream accounts_integration.AccountsIntegrationClientAccountGrpcModel);
     rpc UpdateAccountTradingDisabled(accounts_integration.AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest) returns (accounts_integration.AccountsIntegrationAccountGrpcResponse);
-    rpc Ping(google.protobuf.Empty) returns(accounts_integration.PingResponse);
+    rpc Ping(google.protobuf.Empty) returns(google.protobuf.Empty);
 }

@@ -1,26 +1,19 @@
 use std::sync::Arc;
 
-use rust_extensions::AppStates;
-
-use crate::{AccountsManagerGrpcClient, SettingsModel};
+use crate::{grpc_clients::AccountsManagerGrpcClient, settings::SettingsReader};
 
 pub const APP_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 pub const APP_NAME: &'static str = env!("CARGO_PKG_NAME");
 pub struct AppContext {
-    pub accounts_manager_grpc_client: Arc<AccountsManagerGrpcClient>,
-    pub settings: Arc<SettingsModel>,
-    pub app_states: Arc<AppStates>,
+    pub accounts_manager_grpc_client: AccountsManagerGrpcClient,
+    pub settings_reader: Arc<SettingsReader>,
 }
 
 impl AppContext {
-    pub async fn new(settings: Arc<SettingsModel>) -> Self {
-        let grpc_client =
-            AccountsManagerGrpcClient::new(settings.accounts_manager_grpc_service.clone()).await;
-
+    pub async fn new(settings_reader: Arc<SettingsReader>) -> Self {
         Self {
-            accounts_manager_grpc_client: Arc::new(grpc_client),
-            settings,
-            app_states: Arc::new(AppStates::create_initialized()),
+            accounts_manager_grpc_client: AccountsManagerGrpcClient::new(settings_reader.clone()),
+            settings_reader,
         }
     }
 }

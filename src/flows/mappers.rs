@@ -1,9 +1,30 @@
 use crate::{
-    accounts_integration::{
-        AccountsIntegrationClientAccountGrpcModel, AccountsIntegrationOperationResult, AccountsIntegrationUpdateAccountBalanceReason,
-    },
-    accounts_manager::{AccountGrpcModel, AccountsManagerOperationResult, UpdateBalanceReason},
+    accounts_integration::AccountsIntegrationOperationResult,
+    accounts_manager_grpc::AccountsManagerOperationResult,
 };
+
+use crate::{accounts_integration::*, accounts_manager_grpc::*};
+
+pub fn convert_result<TResult>(
+    op_result: AccountsManagerOperationResult,
+    get_result: impl FnOnce() -> TResult,
+) -> Result<TResult, AccountsIntegrationOperationResult> {
+    match op_result {
+        AccountsManagerOperationResult::Ok => Ok(get_result()),
+        AccountsManagerOperationResult::AccountNotFound => {
+            Err(AccountsIntegrationOperationResult::AccountNotFound)
+        }
+        AccountsManagerOperationResult::TraderNotFound => {
+            Err(AccountsIntegrationOperationResult::TraderNotFound)
+        }
+        AccountsManagerOperationResult::NotEnoughBalance => {
+            Err(AccountsIntegrationOperationResult::NotEnoughBalance)
+        }
+        AccountsManagerOperationResult::ProcessIdDuplicate => {
+            Err(AccountsIntegrationOperationResult::ProcessIdDuplicate)
+        }
+    }
+}
 
 impl Into<AccountsIntegrationClientAccountGrpcModel> for AccountGrpcModel {
     fn into(self) -> AccountsIntegrationClientAccountGrpcModel {
@@ -20,23 +41,29 @@ impl Into<AccountsIntegrationClientAccountGrpcModel> for AccountGrpcModel {
     }
 }
 
-impl From<i32> for AccountsIntegrationUpdateAccountBalanceReason  {
+/*
+impl From<i32> for AccountsIntegrationUpdateAccountBalanceReason {
     fn from(value: i32) -> Self {
-        match value{
+        match value {
             0 => AccountsIntegrationUpdateAccountBalanceReason::BalanceCorrection,
             1 => AccountsIntegrationUpdateAccountBalanceReason::Deposit,
             2 => AccountsIntegrationUpdateAccountBalanceReason::Withdrawal,
-            _ => panic!("Unknown value for AccountsIntegrationUpdateAccountBalanceReason")
+            _ => panic!("Unknown value for AccountsIntegrationUpdateAccountBalanceReason"),
         }
     }
 }
+ */
 
 impl Into<UpdateBalanceReason> for AccountsIntegrationUpdateAccountBalanceReason {
     fn into(self) -> UpdateBalanceReason {
-        match self{
-            AccountsIntegrationUpdateAccountBalanceReason::BalanceCorrection => UpdateBalanceReason::BalanceCorrection,
+        match self {
+            AccountsIntegrationUpdateAccountBalanceReason::BalanceCorrection => {
+                UpdateBalanceReason::BalanceCorrection
+            }
             AccountsIntegrationUpdateAccountBalanceReason::Deposit => UpdateBalanceReason::Deposit,
-            AccountsIntegrationUpdateAccountBalanceReason::Withdrawal => UpdateBalanceReason::Withdrawal,
+            AccountsIntegrationUpdateAccountBalanceReason::Withdrawal => {
+                UpdateBalanceReason::Withdrawal
+            }
         }
     }
 }
@@ -53,6 +80,9 @@ impl Into<AccountsIntegrationOperationResult> for AccountsManagerOperationResult
             }
             AccountsManagerOperationResult::NotEnoughBalance => {
                 AccountsIntegrationOperationResult::NotEnoughBalance
+            }
+            AccountsManagerOperationResult::ProcessIdDuplicate => {
+                AccountsIntegrationOperationResult::ProcessIdDuplicate
             }
         }
     }
