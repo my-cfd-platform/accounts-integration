@@ -1,9 +1,9 @@
 use crate::{
-    accounts_integration::AccountsIntegrationOperationResult,
+    accounts_integration_grpc::AccountsIntegrationOperationResult,
     accounts_manager_grpc::AccountsManagerOperationResult,
 };
 
-use crate::{accounts_integration::*, accounts_manager_grpc::*};
+use crate::{accounts_integration_grpc::*, accounts_manager_grpc::*};
 
 pub fn convert_result<TResult>(
     op_result: AccountsManagerOperationResult,

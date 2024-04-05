@@ -10,7 +10,7 @@ pub struct AppContext {
 }
 
 impl AppContext {
-    pub async fn new(settings_reader: Arc<SettingsReader>) -> Self {
+    pub fn new(settings_reader: Arc<SettingsReader>) -> Self {
         Self {
             accounts_manager_grpc_client: AccountsManagerGrpcClient::new(settings_reader.clone()),
             settings_reader,

@@ -1,3 +1,3 @@
 mod accounts_integration_grpc_service;
-mod server;
-pub use server::*;
+mod grpc_service;
+pub use grpc_service::*;

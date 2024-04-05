@@ -1,12 +1,10 @@
 service_sdk::macros::use_grpc_server!();
 
-use crate::accounts_integration::accounts_integration_grpc_service_server::AccountsIntegrationGrpcService;
-use crate::accounts_integration::*;
-
-use super::server::GrpcService;
+use crate::accounts_integration_grpc::accounts_integration_grpc_service_server::AccountsIntegrationGrpcService;
+use crate::{accounts_integration_grpc::*, SdkGrpcService};
 
 #[tonic::async_trait]
-impl AccountsIntegrationGrpcService for GrpcService {
+impl AccountsIntegrationGrpcService for SdkGrpcService {
     #[with_telemetry]
     async fn create_client_account(
         &self,

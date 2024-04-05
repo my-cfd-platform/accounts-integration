@@ -1,7 +1,7 @@
 use service_sdk::my_telemetry::MyTelemetryContext;
 
 use crate::{
-    accounts_integration::{
+    accounts_integration_grpc::{
         AccountsIntegrationClientAccountGrpcModel, AccountsIntegrationOperationResult,
     },
     AppContext,
