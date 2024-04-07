@@ -17,8 +17,12 @@ pub async fn create_account(
     process_id: String,
     my_telemetry: &MyTelemetryContext,
 ) -> Result<AccountsIntegrationClientAccountGrpcModel, AccountsIntegrationOperationResult> {
-    //todo!("Check Trading Group Validity")
-    //todo!("Check Currency Group Validity")
+    if let Some(trading_group_id) = trading_group_id.as_ref() {
+        crate::internal_scripts::check_trading_group(app, trading_group_id).await?;
+    }
+
+    crate::internal_scripts::check_account_currency(currency.as_str())?;
+
     let response = app
         .accounts_manager_grpc_client
         .create_account(

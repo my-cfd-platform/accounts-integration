@@ -37,6 +37,7 @@ pub async fn update_balance(
                 comment,
                 reason: reason.into(),
                 reference_transaction_id,
+                same_response_process_id: true, //todo!("What is that?")
             },
             my_telemetry,
         )

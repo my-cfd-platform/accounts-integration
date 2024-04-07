@@ -2,6 +2,7 @@ mod app;
 mod flows;
 mod grpc_clients;
 mod grpc_server;
+mod internal_scripts;
 mod settings;
 
 use accounts_integration_grpc::accounts_integration_grpc_service_server::AccountsIntegrationGrpcServiceServer;
@@ -27,7 +28,7 @@ async fn main() {
 
     let mut service_context = service_sdk::ServiceContext::new(settings_reader.clone()).await;
 
-    let app = AppContext::new(settings_reader);
+    let app = AppContext::new(settings_reader, &service_context).await;
     let app = Arc::new(app);
 
     let grpc_service = SdkGrpcService::new(app.clone());

@@ -16,6 +16,7 @@ pub struct SettingsModel {
     pub accounts_manager_grpc_url: String,
     pub seq_conn_string: String,
     pub my_telemetry: String,
+    pub my_no_sql_tcp_reader: String,
 }
 
 #[async_trait::async_trait]

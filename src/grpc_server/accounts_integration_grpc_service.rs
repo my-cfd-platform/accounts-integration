@@ -80,26 +80,16 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
         request: tonic::Request<AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest>,
     ) -> Result<tonic::Response<AccountsIntegrationAccountGrpcResponse>, tonic::Status> {
         let request = request.into_inner();
-        todo!("Implement")
 
-        /*
-        let response = self
-            .app
-            .accounts_manager_grpc_client
-            .update_account_trading_disabled(
-                AccountsIntegrationUpdateAccountTradingDisabledGrpcRequest {
-                    trader_id: request.trader_id,
-                    account_id: request.account_id,
-                    trading_disabled: request.trading_disabled,
-                    process_id: request.process_id,
-                },
-                my_telemetry,
-            )
-            .await
-            .unwrap();
-
-        let response =
-            super::mappers::convert_result(response.result(), || response.account.unwrap());
+        let response = crate::flows::update_account_trading_disabled(
+            &self.app,
+            request.trader_id,
+            request.account_id,
+            request.process_id,
+            request.trading_disabled,
+            my_telemetry,
+        )
+        .await;
 
         let response = match response {
             Ok(account) => AccountsIntegrationAccountGrpcResponse {
@@ -113,7 +103,6 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
         };
 
         Ok(tonic::Response::new(response))
-         */
     }
 
     generate_server_stream!(stream_name:"GetClientAccountsStream", item_name:"AccountsIntegrationClientAccountGrpcModel");
@@ -125,29 +114,10 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
     ) -> Result<tonic::Response<Self::GetClientAccountsStream>, tonic::Status> {
         let request = request.into_inner();
 
-        todo!("Implement")
-        /*
-        let accounts = self
-            .app
-            .accounts_manager_grpc_client
-            .get_client_accounts(
-                AccountsIntegrationGetClientAccountsGrpcRequest {
-                    trader_id: request.trader_id,
-                },
-                my_telemetry,
-            )
-            .await
-            .unwrap();
-
-        let accounts = if let Some(accounts) = accounts {
-            accounts
-        } else {
-            vec![]
-        };
+        let accounts = crate::flows::get_accounts(&self.app, request.trader_id, my_telemetry).await;
 
         my_grpc_extensions::grpc_server::send_vec_to_stream(accounts.into_iter(), |x| x.into())
             .await
-             */
     }
 
     async fn ping(&self, _: tonic::Request<()>) -> Result<tonic::Response<()>, tonic::Status> {
