@@ -1,5 +1,7 @@
 service_sdk::macros::use_grpc_server!();
 
+use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
+
 use crate::accounts_integration_grpc::accounts_integration_grpc_service_server::AccountsIntegrationGrpcService;
 use crate::{accounts_integration_grpc::*, SdkGrpcService};
 
@@ -16,7 +18,7 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
             &self.app,
             request.trader_id,
             request.currency,
-            request.trading_group_id,
+            Some(request.trading_group_id),
             request.process_id,
             my_telemetry,
         )
@@ -81,11 +83,13 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
     ) -> Result<tonic::Response<AccountsIntegrationAccountGrpcResponse>, tonic::Status> {
         let request = request.into_inner();
 
+        let process_id = DateTimeAsMicroseconds::now().unix_microseconds.to_string();
+
         let response = crate::flows::update_account_trading_disabled(
             &self.app,
             request.trader_id,
             request.account_id,
-            request.process_id,
+            process_id,
             request.trading_disabled,
             my_telemetry,
         )
