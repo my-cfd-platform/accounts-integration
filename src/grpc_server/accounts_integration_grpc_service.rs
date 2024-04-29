@@ -14,6 +14,8 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
     ) -> Result<tonic::Response<AccountsIntegrationAccountGrpcResponse>, tonic::Status> {
         let request = request.into_inner();
 
+        self.app.check_api_key(&request.api_key).await;
+
         let response = crate::flows::create_account(
             &self.app,
             request.trader_id,
@@ -45,6 +47,8 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
     ) -> Result<tonic::Response<AccountsIntegrationAccountUpdateBalanceGrpcResponse>, tonic::Status>
     {
         let request = request.into_inner();
+
+        self.app.check_api_key(&request.api_key).await;
 
         let reason = request.reason();
 
@@ -83,6 +87,8 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
     ) -> Result<tonic::Response<AccountsIntegrationAccountGrpcResponse>, tonic::Status> {
         let request = request.into_inner();
 
+        self.app.check_api_key(&request.api_key).await;
+
         let process_id = DateTimeAsMicroseconds::now().unix_microseconds.to_string();
 
         let response = crate::flows::update_account_trading_disabled(
@@ -117,6 +123,7 @@ impl AccountsIntegrationGrpcService for SdkGrpcService {
         request: tonic::Request<AccountsIntegrationGetClientAccountsGrpcRequest>,
     ) -> Result<tonic::Response<Self::GetClientAccountsStream>, tonic::Status> {
         let request = request.into_inner();
+        self.app.check_api_key(&request.api_key).await;
 
         let accounts = crate::flows::get_accounts(&self.app, request.trader_id, my_telemetry).await;
 
