@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use my_nosql_contracts::{IntegrationSettingsMyNoSqlEntity, TradingGroupNoSqlEntity};
+use my_nosql_contracts::{IntegrationTenantMyNoSqlEntity, TradingGroupNoSqlEntity};
 use service_sdk::{my_no_sql_sdk::reader::MyNoSqlDataReaderTcp, ServiceContext};
 
 use crate::{grpc_clients::AccountsManagerGrpcClient, settings::SettingsReader};
@@ -11,7 +11,7 @@ pub struct AppContext {
     pub accounts_manager_grpc_client: AccountsManagerGrpcClient,
     pub trading_groups: Arc<MyNoSqlDataReaderTcp<TradingGroupNoSqlEntity>>,
     pub settings_reader: Arc<SettingsReader>,
-    pub integration_settings: Arc<MyNoSqlDataReaderTcp<IntegrationSettingsMyNoSqlEntity>>,
+    pub integration_settings: Arc<MyNoSqlDataReaderTcp<IntegrationTenantMyNoSqlEntity>>,
 }
 
 impl AppContext {
@@ -28,16 +28,19 @@ impl AppContext {
     }
 
     pub async fn check_api_key(&self, api_key: &str) {
-        let entity = self
+        let entities = self
             .integration_settings
-            .get_entity(
-                IntegrationSettingsMyNoSqlEntity::generate_partition_key(),
-                IntegrationSettingsMyNoSqlEntity::generate_row_key(api_key),
-            )
+            .get_by_partition_key_as_vec(IntegrationTenantMyNoSqlEntity::generate_partition_key())
             .await;
 
-        if entity.is_none() {
-            panic!("Invalid API key");
+        if let Some(entities) = entities {
+            for entity in entities {
+                if entity.is_my_configuration(api_key) {
+                    return;
+                }
+            }
         }
+
+        panic!("Invalid API key");
     }
 }
