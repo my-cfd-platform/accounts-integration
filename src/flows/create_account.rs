@@ -31,6 +31,7 @@ pub async fn create_account(
                 currency,
                 trading_group_id,
                 process_id,
+                metadata: vec![],
             },
             my_telemetry,
         )
